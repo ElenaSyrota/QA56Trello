@@ -4,19 +4,12 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.testng.Assert;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
-public class LoginTests {
-    public WebDriver driver;
-
-    @BeforeMethod
-    public void iniTests() throws InterruptedException {
-        driver = new ChromeDriver();
-        driver.get("https://www.trello.com");
-        Thread.sleep(5000);
-    }
+public class LoginTests extends TestBase {
 
     @Test
     public void loginTestPositive() throws InterruptedException {
@@ -30,11 +23,15 @@ public class LoginTests {
         Thread.sleep(6000);
         driver.findElement(By.id("password")).sendKeys("638465Lena");
         driver.findElement(By.id("login-submit")).click();
-        Thread.sleep(25000);
-        System.out.println("'Boards' button text: "+ driver
-                .findElement(By.xpath("//button[@data-test-id='header-boards-menu-button']/span[2]")).getText());
-       Thread.sleep(5000);
+        Thread.sleep(30000);
 
+        WebElement boardIcon = driver.findElement(By
+                .xpath("//button[@data-test-id='header-boards-menu-button']/span[2]"));
+
+        System.out.println("'Boards' button text: "+ boardIcon.getText());
+        Thread.sleep(5000);
+
+        Assert.assertEquals("Boards", boardIcon.getText(),"Text on boardIcon is not 'Boards'");
     }
     @Test
     public void loginNegativeNoLoginNoPassword() throws InterruptedException {
@@ -44,7 +41,11 @@ public class LoginTests {
 
         driver.findElement(By.id("login")).click();
         Thread.sleep(6000);
-        System.out.println("Error massage: "+ driver.findElement(By.cssSelector("#error>p")).getText());
+
+        WebElement errorMsg = driver.findElement(By.cssSelector("#error>p"));
+        System.out.println("Error massage: "+ errorMsg.getText());
+
+        Assert.assertEquals("Missing email", errorMsg.getText(),"Error!NoLoginNoPassword! ");
 
     }
     @Test
@@ -56,8 +57,13 @@ public class LoginTests {
         Thread.sleep(6000);
         driver.findElement(By.id("login")).click();
         Thread.sleep(8000);
-        System.out.println(driver.findElement(By.id("error")).getText());
+
+        WebElement errorMsg1 = driver.findElement(By.id("error"));
+        System.out.println(errorMsg1.getText());
         Thread.sleep(6000);
+
+        Assert.assertEquals("There isn't an account for this username", errorMsg1.getText(),"Error! EmailNegative! ");
+
     }
     @Test
     public void logInToTrelloPasswordNegative() throws InterruptedException {
@@ -72,12 +78,12 @@ public class LoginTests {
         Thread.sleep(6000);
         driver.findElement(By.id("login-submit")).click();
         Thread.sleep(6000);
-        System.out.println(driver.findElement(By.id("login-error")).getText());
-        Thread.sleep(6000);
-    }
 
-    @AfterMethod
-    public void  tearDown(){
-        driver.quit();
+        WebElement errorMsg2 = driver.findElement(By.id("login-error"));
+        System.out.println(errorMsg2.getText());
+        Thread.sleep(6000);
+
+        Assert.assertEquals("Incorrect email address and / or password.\n" +
+                "Do you need help logging in?", errorMsg2.getText(),"Error! PasswordNegative! ");
     }
 }
