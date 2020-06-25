@@ -5,8 +5,86 @@ import org.openqa.selenium.WebElement;
 import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
+import pages.BoardsPageHelper;
+import pages.LoginPageHelper;
+import pages.ProfilesVisabilityHelper;
 
-public class ProfileVisabilityTests extends TestBase {
+import java.util.List;
+
+public class ProfilesVisabilityTests extends TestBase {
+
+    LoginPageHelper loginPage;
+    BoardsPageHelper boardsPage;
+    ProfilesVisabilityHelper profilesVisability;
+
+    @BeforeMethod
+    public void initTests() throws InterruptedException {
+        loginPage= new LoginPageHelper(driver);
+        boardsPage= new BoardsPageHelper(driver);
+        profilesVisability = new ProfilesVisabilityHelper(driver);
+        loginPage.openLoginPage();
+
+        loginPage.loginAsAtlassian(LOGIN,PASSWORD);
+        boardsPage.waitUntilPageIsLoaded();
+
+        profilesVisability.openUpRightMenu();
+        profilesVisability.waitUntilUpRightMenuIsVisible();
+        profilesVisability.openProfileVisabilityMenu();
+        profilesVisability.waitUntilPageIsLoaded();
+
+    }
+
+    @Test
+    public void lettersIconTest() throws InterruptedException {
+
+        //--- Receive Upper Right Menu element---
+        WebElement upRightMenu = driver.findElement(By.xpath("//button[@data-test-id = 'header-member-menu-button']"));
+        WebElement upRightMenuText = upRightMenu.findElement(By.xpath(".//span"));
+
+        //--- Receive list of necessary icons ---
+        List<WebElement> iconsList = driver.findElements(By.xpath(createLocatorIconlist(USERNAME)));
+        System.out.println(iconsList);
+
+        int counter = 0;
+
+        for(WebElement element: iconsList)
+            if (element.getText().equals(upRightMenuText.getText()))
+               counter++;
+
+        Assert.assertEquals(2,counter, "The text on the upper right icon and on the icon on profile is not the same");
+
+    }
+
+    @Test
+    public void userNameDisplayingTest(){
+
+        profilesVisability.receiveUserNameAfterShtrudel();
+        profilesVisability.receiveUserNameFieldUser();
+
+        //--- Receive UserName after shtrudel without username value
+        WebElement userNameAfterShtrudel = driver.findElement(By.xpath("//span[contains(text(),'@')]"));
+
+        //--- Receive UserName from user name field
+        WebElement userNameField = driver.findElement(By.xpath("//input[@name='username']"));
+
+        Assert.assertTrue(userNameAfterShtrudel.getText().contains(USERNAME)&&userNameField.getAttribute("value").equals(USERNAME));
+    }
+
+
+    private String createLocatorIconlist(String username) {
+        return "//div[@title='" + username + " (" + username + ")']//span";
+    }
+
+}
+/*package tests;
+
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebElement;
+import org.testng.Assert;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
+
+public class ProfileVisibilityTests extends TestBase {
 
     @BeforeMethod
     public void initTests() throws InterruptedException {
@@ -72,4 +150,4 @@ public class ProfileVisabilityTests extends TestBase {
     }
 
 
-}
+}*/

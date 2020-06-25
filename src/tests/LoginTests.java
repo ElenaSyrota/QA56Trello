@@ -4,86 +4,62 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.support.ui.ExpectedCondition;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
 import org.testng.Assert;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
+import pages.BoardsPageHelper;
+import pages.LoginPageHelper;
 
 public class LoginTests extends TestBase {
 
-    @Test
-    public void loginTestPositive() throws InterruptedException {
+    LoginPageHelper loginPage;
+    BoardsPageHelper boardsPage;
 
-        driver.findElement(By.linkText("Log In")).click();
-        Thread.sleep(5000);
-
-        driver.findElement(By.id("user")).sendKeys("lena.syrota@gmail.com");
-        Thread.sleep(2000);
-        driver.findElement(By.id("login")).click();
-        Thread.sleep(6000);
-        driver.findElement(By.id("password")).sendKeys("638465Lena");
-        driver.findElement(By.id("login-submit")).click();
-        Thread.sleep(30000);
-
-        WebElement boardIcon = driver.findElement(By
-                .xpath("//button[@data-test-id='header-boards-menu-button']/span[2]"));
-
-        System.out.println("'Boards' button text: "+ boardIcon.getText());
-        Thread.sleep(5000);
-
-        Assert.assertEquals("Boards", boardIcon.getText(),"Text on boardIcon is not 'Boards'");
+    @BeforeMethod
+    public void initTests(){
+        loginPage= new LoginPageHelper(driver);
+        boardsPage= new BoardsPageHelper(driver);
     }
     @Test
-    public void loginNegativeNoLoginNoPassword() throws InterruptedException {
+    public void loginTestPositive()  {
 
-        driver.findElement(By.linkText("Log In")).click();
-        Thread.sleep(5000);
+        loginPage.openLoginPage();
+        loginPage.enterLoginAtlassianAndClickLogin(LOGIN);
+        loginPage.enterPasswordAtlassianAndClickLogin(PASSWORD);
+        boardsPage.waitUntilPageIsLoaded();
 
-        driver.findElement(By.id("login")).click();
-        Thread.sleep(6000);
+        Assert.assertEquals(boardsPage.getButtonBoadrsText(),"Boards", "Text on boardIcon is not 'Boards'");
+    }
 
-        WebElement errorMsg = driver.findElement(By.cssSelector("#error>p"));
-        System.out.println("Error massage: "+ errorMsg.getText());
+    @Test
+    public void loginNegativeNoLoginNoPassword()  {
+        loginPage.openLoginPage();
+        loginPage.pressLoginButton();
+        loginPage.waitErrorMessage();
 
-        Assert.assertEquals("Missing email", errorMsg.getText(),"Error!NoLoginNoPassword! ");
-
+        Assert.assertEquals("Missing email",loginPage.getErrorMessage(),"The text of the message is not 'Missing email'");
     }
     @Test
-    public void logInToTrelloEmailNegative() throws InterruptedException {
-        WebElement loginButton = driver.findElement(By.xpath("//a[@class='btn btn-sm btn-link text-white']"));
-        loginButton.click();
-        Thread.sleep(6000);
-        driver.findElement(By.cssSelector("input[placeholder='Enter email']")).sendKeys("typl");
-        Thread.sleep(6000);
-        driver.findElement(By.id("login")).click();
-        Thread.sleep(8000);
+    public void NegativeLoginIncorrect()  {
+        loginPage.pressLoginMenuButton();
+        loginPage.enterLoginIncorrect();
+        loginPage.pressLoginButton();
+        loginPage.waitErrorMessageLoginIncorrect();
 
-        WebElement errorMsg1 = driver.findElement(By.id("error"));
-        System.out.println(errorMsg1.getText());
-        Thread.sleep(6000);
-
-        Assert.assertEquals("There isn't an account for this username", errorMsg1.getText(),"Error! EmailNegative! ");
-
+       Assert.assertEquals("There isn't an account for this email",loginPage.getErrorMessageLoginIncorrect(), "Error message is not correct");
     }
     @Test
-    public void logInToTrelloPasswordNegative() throws InterruptedException {
-        WebElement loginButton = driver.findElement(By.xpath("//a[@class='btn btn-sm btn-link text-white']"));
-        loginButton.click();
-        Thread.sleep(6000);
-        driver.findElement(By.cssSelector("input[placeholder='Enter email']")).sendKeys("lena.syrota@gmail.com");
-        Thread.sleep(6000);
-        driver.findElement(By.id("login")).click();
-        Thread.sleep(6000);
-        driver.findElement(By.cssSelector("input[placeholder='Enter password']")).sendKeys("1111");
-        Thread.sleep(6000);
-        driver.findElement(By.id("login-submit")).click();
-        Thread.sleep(6000);
+    public void NegativePasswordIncorrect() {
+        loginPage.openLoginPage();
+        loginPage.enterLoginAtlassianAndClickLogin(LOGIN);
+        loginPage.enterPasswordIncorrectAndClickLogin();
+        loginPage.waitErrorMessagePasswordIncorrect();
 
-        WebElement errorMsg2 = driver.findElement(By.id("login-error"));
-        System.out.println(errorMsg2.getText());
-        Thread.sleep(6000);
-
-        Assert.assertEquals("Incorrect email address and / or password.\n" +
-                "Do you need help logging in?", errorMsg2.getText(),"Error! PasswordNegative! ");
-    }
+        Assert.assertTrue(loginPage.getErrorMessagePasswordIncorrect().contains("Incorrect email address and / or password."),
+               "There is no error message or the text of the message is not correct");
+        }
 }
