@@ -4,6 +4,7 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.support.PageFactory;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
@@ -21,13 +22,14 @@ public class LoginTests extends TestBase {
 
     @BeforeMethod
     public void initTests(){
-        loginPage= new LoginPageHelper(driver);
-        boardsPage= new BoardsPageHelper(driver);
+
+        loginPage = PageFactory.initElements(driver, LoginPageHelper.class);
+        boardsPage= PageFactory.initElements(driver,BoardsPageHelper.class);
+        loginPage.openLoginPage();
     }
     @Test
     public void loginTestPositive()  {
 
-        loginPage.openLoginPage();
         loginPage.enterLoginAtlassianAndClickLogin(LOGIN);
         loginPage.enterPasswordAtlassianAndClickLogin(PASSWORD);
         boardsPage.waitUntilPageIsLoaded();
@@ -37,7 +39,7 @@ public class LoginTests extends TestBase {
 
     @Test
     public void loginNegativeNoLoginNoPassword()  {
-        loginPage.openLoginPage();
+
         loginPage.pressLoginButton();
         loginPage.waitErrorMessage();
 
@@ -45,16 +47,17 @@ public class LoginTests extends TestBase {
     }
     @Test
     public void NegativeLoginIncorrect()  {
-        loginPage.pressLoginMenuButton();
-        loginPage.enterLoginIncorrect();
-        loginPage.pressLoginButton();
+
+        loginPage.enterLoginIncorrect("lena@gmail.com");
+        loginPage.clickLoginButton();
         loginPage.waitErrorMessageLoginIncorrect();
 
-       Assert.assertEquals("There isn't an account for this email",loginPage.getErrorMessageLoginIncorrect(), "Error message is not correct");
+       Assert.assertEquals("There isn't an account for this email",loginPage.getErrorMessageLoginIncorrect(),
+                "Error message is not correct");
     }
     @Test
     public void NegativePasswordIncorrect() {
-        loginPage.openLoginPage();
+
         loginPage.enterLoginAtlassianAndClickLogin(LOGIN);
         loginPage.enterPasswordIncorrectAndClickLogin();
         loginPage.waitErrorMessagePasswordIncorrect();

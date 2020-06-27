@@ -3,32 +3,62 @@ package pages;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 public class LoginPageHelper extends PageBase{
-   // WebDriver driver;
+
+    @FindBy(linkText ="Log In")
+    WebElement logInIcon;
+
+    @FindBy(id="login")
+    WebElement loginButton;
+
+    @FindBy(id="user")
+    WebElement userField;
+
+    @FindBy(id="login-submit")
+    WebElement loginSubmitButton;
+
+    @FindBy(id="password")
+    WebElement passwordField;
+
+    @FindBy(css = "#error>p")
+    WebElement noLoginNoPasswordError;
+
+    @FindBy(xpath = "//div[@id ='error']/p")// "(//*[@class='error-message'])[1]")
+    WebElement noLoginError;
+
+    @FindBy(xpath = "//div[@id='login-error']/span")
+    WebElement noPasswordError;
+
+
 
     public LoginPageHelper(WebDriver driver){
         super(driver);
     }
 
     public void openLoginPage(){
-        driver.findElement(By.linkText("Log In")).click();
-        waitUntilElementIsClickable(By.id("login"),10);
+
+        logInIcon.click();
+        waitUntilElementIsClickable(loginButton,10);
     }
 
     public void enterLoginAtlassianAndClickLogin(String login) {
-        driver.findElement(By.id("user")).sendKeys(login);
-        waitUntilAttributValuesIs(By.id("login"), "value", "Log in with Atlassian",10);
 
-        driver.findElement(By.id("login")).click();
-        waitUntilElementIsClickable(By.id("login-submit"), 15);
+        userField.sendKeys(login);
+        waitUntilAttributValuesIs(loginButton, "value", "Log in with Atlassian",10);
+        loginButton.click();
+        waitUntilElementIsClickable(loginSubmitButton, 15);
+
     }
 
     public void enterPasswordAtlassianAndClickLogin(String password) {
-        driver.findElement(By.id("password")).sendKeys(password);
-        driver.findElement(By.id("login-submit")).click();
+
+        passwordField.sendKeys(password);
+        loginSubmitButton.click();
+
     }
 
     public void loginAsAtlassian(String login, String password){
@@ -38,59 +68,57 @@ public class LoginPageHelper extends PageBase{
     }
 
     public void pressLoginButton() {
-        driver.findElement(By.id("login")).click();
+
+        loginButton.click();
     }
 
     public void waitErrorMessage() {
 
-        waitUntilElementIsVisible(By.cssSelector("#error>p"), 10);
+       waitUntilElementIsVisible(noLoginNoPasswordError, 40);
+
     }
     public String getErrorMessage(){
-        WebElement errorMsg = driver.findElement(By.cssSelector("#error>p"));
-        return  errorMsg.getText();
+
+        return  noLoginNoPasswordError.getText();
     }
 
-    public void enterLoginIncorrect(){
-        WebElement loginField = driver.findElement(By.id("user"));
-        loginField.sendKeys("lena@gmail.com");
+    public void enterLoginIncorrect(String login){
 
-       // driver.findElement(By.id("login")).click();
-        //waitUntilElementIsVisible(By.xpath("(//*[@class= 'error-message'])[1]"),20);
+        userField.sendKeys(login);
+        waitUntilElementIsVisible(noLoginError,30);
 
+    }
+    public void clickLoginButton() {
+        loginButton.click();
     }
     public void waitErrorMessageLoginIncorrect() {
-       // WebElement errorMessage = driver.findElement(By.xpath("(//*[class = 'error-message'])[1]"));
-        waitUntilElementIsVisible(By.xpath("(//*[class = 'error-message'])[1]"),15);
+
+        waitUntilElementIsVisible(noLoginError,30);
+
     }
 
     public String getErrorMessageLoginIncorrect(){
-        WebElement errorMessage = driver.findElement(By.xpath("(//*[class = 'error-message'])[1]"));
-       // System.out.println(errorMessage.getText());
-        return  errorMessage.getText();
+        System.out.println(noLoginError.getText());
+        return  noLoginError.getText();
     }
 
     public void enterPasswordIncorrectAndClickLogin() {
-
-        WebElement passwordLogin = driver.findElement(By.id("password"));
-        passwordLogin.sendKeys("error");
-        driver.findElement(By.id("login-submit")).click();
-
-        waitUntilElementIsVisible(By.xpath("//div[@id='login-error']/span"),15);
+        passwordField.sendKeys("error");
+        loginSubmitButton.click();
+        waitUntilElementIsVisible(noPasswordError,15);
 
     }
 
     public void waitErrorMessagePasswordIncorrect() {
 
-        waitUntilAttributValuesIs(By.xpath("//div[@id='login-error']/span"), "value",
-                "Log in with Atlassian",10);
+        waitUntilAttributValuesIs(noPasswordError, "value",
+                "Log in with Atlassian",20);
     }
     public String getErrorMessagePasswordIncorrect(){
-        WebElement errorMessage = driver.findElement(By.xpath("//div[@id='login-error']/span"));
-        return  errorMessage.getText();
+
+        return  noPasswordError.getText();
     }
 
-    public void pressLoginMenuButton() {
-        driver.findElement(By.linkText("Log In")).click();
-        waitUntilElementIsVisible(By.xpath("//input[@id='login']"),10);
-    }
+
+
 }

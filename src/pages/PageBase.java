@@ -2,6 +2,7 @@ package pages;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
@@ -10,18 +11,29 @@ public class PageBase {
     WebDriver driver;
 
     public PageBase(WebDriver driver) {
-        this.driver=driver;
+        this.driver = driver;
     }
 
     public void waitUntilElementIsClickable(By locator, int time) {
-
         try {
-            new WebDriverWait(driver, time).until(ExpectedConditions
+            new WebDriverWait(driver,time).until(ExpectedConditions
                     .elementToBeClickable(locator));
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
+
+    public void waitUntilElementIsClickable(WebElement element, int time) {
+
+        try {
+            new WebDriverWait(driver, time).until(ExpectedConditions
+                            .elementToBeClickable(element));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+
 
     public void waitUntilAttributValuesIs(By locator, String attribut, String value, int time) {
         try {
@@ -31,23 +43,49 @@ public class PageBase {
             e.printStackTrace();
         }
     }
-    public void waitUntilElementIsVisible(By locator, int time) {
-
+    public void waitUntilAttributValuesIs(WebElement element, String attribut, String value, int time) {
         try {
             new WebDriverWait(driver, time).until(ExpectedConditions
+                    .attributeToBe(element,attribut,value));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void waitUntilElementIsVisible(By locator, int time) {
+        try {
+            new WebDriverWait(driver,time).until(ExpectedConditions
                     .visibilityOfElementLocated(locator));
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
-    public void waitUntilElementIsNotVisible(By locator, int time) {
+    public void waitUntilElementIsVisible(WebElement element, int time) {
         try {
-            new WebDriverWait(driver, time).until(ExpectedConditions
-                    .elementToBeClickable(locator));
+            new WebDriverWait(driver,time).until(ExpectedConditions
+                    .visibilityOf(element));
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
+
+    public void waitUntilElementIsNotVisible(By locator, int time) {
+        try {
+            new WebDriverWait(driver, time).until(ExpectedConditions
+                    .invisibilityOfElementLocated(locator));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+    public void waitUntilElementIsNotVisible(WebElement element, int time) {
+        try {
+            new WebDriverWait(driver, time).until(ExpectedConditions
+                            .invisibilityOf(element));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     public void waitUntilAllElementsAreVisible(By locator, int time) {
         try {
             new WebDriverWait(driver,time).until(ExpectedConditions

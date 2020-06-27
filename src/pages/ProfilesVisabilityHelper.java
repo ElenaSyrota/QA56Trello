@@ -3,40 +3,80 @@ package pages;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.FindBy;
+
+import static tests.TestBase.USER_NAME_MENU;
 
 public class ProfilesVisabilityHelper extends PageBase{
+
+    @FindBy (xpath = "//button[@data-test-id = 'header-member-menu-button']")
+    WebElement upRightMenu;
+
+    @FindBy (xpath = "//a[@data-test-id = 'header-member-menu-profile']")
+    WebElement profileVisabilityMenu;
+
+    @FindBy (xpath = "//button[contains(text(),'Save')]")
+    WebElement buttonProfileVisabilityMenu;
+
+    @FindBy (xpath = "//span[contains(text(),'@')]")
+    WebElement userNameAfterShtrudel;
+
+    @FindBy (xpath = "//input[@name='username']")
+    WebElement userNameField;
+
+    @FindBy (xpath = "//button[@aria-label='Open Member Menu']")
+    WebElement menuTextButton;
 
     public ProfilesVisabilityHelper(WebDriver driver){
         super(driver);
     }
 
     public void openUpRightMenu() {
-        WebElement upRightMenu = driver.findElement(By.xpath("//button[@data-test-id = 'header-member-menu-button']"));
+
         upRightMenu.click();
     }
 
     public void waitUntilUpRightMenuIsVisible() {
-        waitUntilElementIsVisible(By.xpath("//a[@data-test-id = 'header-member-menu-profile']"),10);
+
+        waitUntilElementIsClickable(profileVisabilityMenu,20);
+
     }
 
     public void openProfileVisabilityMenu() {
-        WebElement profileVisabilityMenu = driver
-                .findElement(By.xpath("//a[@data-test-id = 'header-member-menu-profile']"));
+
         profileVisabilityMenu.click();
-        waitUntilElementIsVisible(By.xpath("//a[@data-test-id = 'header-member-menu-profile']"),10);
+
     }
 
     public void waitUntilPageIsLoaded() {
-        //waitUntilAllElementsAreVisible(By.xpath("//button[@data-test-id = 'header-member-menu-button']"),20);
-        waitUntilElementIsClickable(By.xpath("//button[contains(text(),'Save')]"),10);
+
+        waitUntilElementIsClickable(buttonProfileVisabilityMenu,10);
     }
 
-    public void receiveUserNameAfterShtrudel() {
-        WebElement userNameAfterShtrudel = driver.findElement(By.xpath("//span[contains(text(),'@')]"));
+    public String receiveUserNameAfterShtrudel() {
+
+        return userNameAfterShtrudel.getText();
 
     }
 
-    public void receiveUserNameFieldUser() {
-        WebElement userNameField = driver.findElement(By.xpath("//input[@name='username']"));
+    public String receiveUserNameFieldUser() {
+
+        return "@"+userNameField.getAttribute("value");
+    }
+
+    public String openMemberMenu() {
+
+        menuTextButton.click();
+        return menuTextButton.getText();
+    }
+
+
+    private String nameLocator(String nameTitle) {
+        return "//div[@title = '" + nameTitle + "']";
+    }
+
+    public String nameTextLabel() {
+        WebElement nameTextLabel = driver.findElement(By.xpath(nameLocator(USER_NAME_MENU)));
+        return nameTextLabel.getText();
     }
 }
