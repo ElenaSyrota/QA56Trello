@@ -8,109 +8,72 @@ import org.openqa.selenium.support.PageFactory;
 
 import java.util.List;
 
-import static tests.TestBase.BOARD_TITLE;
 
 public class CurrentBoardHelper extends PageBase{
-
-    private String boardName;
-
-    @FindBy(xpath ="//span[@class='placeholder']")
+    @FindBy(xpath = "//span[@class='placeholder']")
     WebElement addListOption;
 
-    @FindBy(xpath ="//input[@placeholder='Enter list title...']")
+    @FindBy(xpath = "//input[@placeholder='Enter list title...']")
     WebElement addTitleField;
 
-    @FindBy(xpath ="//input[@type='submit']")
-    WebElement submitListButton;
+    @FindBy(xpath="//input[@type='submit']")
+    WebElement addListButton;
 
-    @FindBy(xpath ="//a[@class='icon-lg icon-close dark-hover js-cancel-edit']")
+    @FindBy(xpath = "//a[@class='icon-lg icon-close dark-hover js-cancel-edit']")
     WebElement cancelEditList;
-
-    @FindBy(xpath ="//div[@class = 'list js-list-content']")
-    WebElement getList;
 
     @FindBy(xpath = "//div[@class = 'list js-list-content']")
     List<WebElement> listLists;
 
-    @FindBy(css = "span.js-add-a-card")
-    WebElement addCardButton;
 
-    @FindBy(css = "span.js-add-another-card")
-    WebElement addAnotherCardButton;
-
-    @FindBy(css = "textarea.list-card-composer-textarea")
-    WebElement addTextCurrentCard;
-
-    @FindBy(xpath ="//input[@type='submit'][@value = 'Add Card']")
-    WebElement submitCardButton;
-
-    @FindBy(css = "div.card-composer a.icon-close")
-    WebElement addEditCardButton;
-
-    @FindBy(css = "a-list-card")
-    List<WebElement> listCards;
+    private String boardName;
 
     public CurrentBoardHelper(WebDriver driver, String boardName) {
         super(driver);
         this.boardName = boardName;
         PageFactory.initElements(driver,this);
     }
-
     public void openCurrentBoard(){
-        WebElement ourBoard = driver.findElement(By.xpath(boardLocator()));
+        System.out.println("From openCurrentBoard: " + this.boardName);
+        WebElement ourBoard = driver
+                .findElement(By.xpath(boardLocator()));
         ourBoard.click();
     }
 
     public void waitUntilPageIsLoaded(){
-        waitUntilElementIsVisible(By.xpath(boardLocator()),20);
-        waitUntilElementIsClickable(addListOption, 20);
+        waitUntilElementIsVisible(By.xpath(boardTitleLocator()),30);
+        waitUntilElementIsClickable(addListOption,30);
     }
 
-    private String boardLocator() {
 
-        return "//div[@title = '" + boardName + "']/../..";
-    }
 
     public int getListsQuantity(){
-        //List<WebElement> li
-
         return listLists.size();
     }
 
-    public void createNewList(String title) {
+    public void createNewList(String title){
         this.pressCreateNewListButton();
         this.enterTitle(title);
         this.submitAddingList();
         this.cancelFromEditMode();
     }
-
-    private void pressCreateNewListButton() {
-
+    public void pressCreateNewListButton() {
         addListOption.click();
-        waitUntilElementIsVisible(addTitleField,20);
-
+        waitUntilElementIsVisible(addTitleField,10);
     }
 
     public void enterTitle(String title) {
-
         addTitleField.click();
-        addTitleField.sendKeys("Test");
-        waitUntilElementIsClickable(submitListButton,30);
+        addTitleField.sendKeys(title);
+        waitUntilElementIsClickable(addListButton,10);
     }
 
     public void submitAddingList() {
-
-        submitListButton.click();
+        addListButton.click();
     }
 
     public void cancelFromEditMode() {
-       cancelEditList.click();
-    }
-
-    public void enterTextCurrentCard(String card) {
-        WebElement textCurrentCard = driver.findElement(By.cssSelector("textarea.list-card-composer-textarea"));
-        textCurrentCard.click();
-        textCurrentCard.sendKeys(card);
+        cancelEditList.click();
     }
 
     public boolean existsList() {
@@ -120,41 +83,48 @@ public class CurrentBoardHelper extends PageBase{
         {
             existsList = true;
         }
-        return  existsList;
+        return existsList;
     }
 
-    public int receiveQuantityCards() {
-        return  driver.findElements(By.cssSelector("a.list-card")).size();
+    public int receiveQuantityOfCards() {
+        return driver.findElements(By.cssSelector("a.list-card")).size();
     }
 
-    public void createNewCard(String title) {
-        this.defineAddingButton();
-        this.enterCardTitle(title);
-        this.submitAddCard();
-        this.cancelFromEditCardButton();
-    }
-    public void defineAddingButton() {
-         if (addCardButton.isDisplayed()) {
+    public void pressAddCardButton(){
+        //--- Define two possible buttons for adding new card and click on the displayed one---
+        WebElement addCardButton = driver
+                .findElement(By.cssSelector("span.js-add-a-card"));
+        WebElement addAnotherCardButton = driver
+                .findElement(By.cssSelector("span.js-add-another-card"));
+        if (addCardButton.isDisplayed()) {
             addCardButton.click();
         }
         else addAnotherCardButton.click();
     }
 
-    public void enterCardTitle(String card) {
-
-        addTextCurrentCard.click();
-        addTextCurrentCard.sendKeys(card);
+    public void enterTextToCard(String test_card) {
+        WebElement textCurrentCard = driver.findElement(By.cssSelector("textarea.list-card-composer-textarea"));
+        textCurrentCard.click();
+        textCurrentCard.sendKeys(test_card);
     }
 
-    public void submitAddCard() {
-
+    public void submitAddingCard() {
+        WebElement submitCardButton = driver.findElement(By.xpath("//input[@type='submit'][@value = 'Add Card']"));
         submitCardButton.click();
-
-    }
-    public void cancelFromEditCardButton() {
-
-        addEditCardButton.click();
-        waitUntilElementIsNotVisible(addEditCardButton,30);
     }
 
+    public void cancelEditCardMode() {
+        WebElement cancelEditCardButton = driver.findElement(By.cssSelector("div.card-composer a.icon-close"));
+        cancelEditCardButton.click();
+        waitUntilElementIsNotVisible(By.cssSelector("div.card-composer a.icon-close"),10);
+    }
+
+    private String boardLocator() {
+        System.out.println("From boardLocator: " + this.boardName);
+        return "//div[@title = '" + boardName + "']/../..";
+    }
+
+    private String boardTitleLocator(){
+        return "//span[contains(text(),'" + boardName + "')]";
+    }
 }

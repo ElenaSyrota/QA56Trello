@@ -1,6 +1,7 @@
 package tests;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.PageFactory;
 import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
@@ -16,11 +17,9 @@ public class CurrentBoardTests extends TestBase{
 
     @BeforeMethod
     public void initTests() throws InterruptedException {
-
         loginPage = PageFactory.initElements(driver,LoginPageHelper.class);
-        boardsPage = PageFactory.initElements(driver, BoardsPageHelper.class);
-        qaHaifa56Page = new CurrentBoardHelper(driver, BOARD_TITLE);
-
+        boardsPage = PageFactory.initElements(driver,BoardsPageHelper.class);
+        qaHaifa56Page = new CurrentBoardHelper(driver,BOARD_TITLE);
         loginPage.openLoginPage();
         loginPage.loginAsAtlassian(LOGIN,PASSWORD);
         boardsPage.waitUntilPageIsLoaded();
@@ -30,34 +29,35 @@ public class CurrentBoardTests extends TestBase{
 
     @Test
     public void createNewList()  {
-
         int beforeAdding = qaHaifa56Page.getListsQuantity();
         System.out.println("Lists before adding: " + beforeAdding);
         qaHaifa56Page.createNewList("Test");
 
         int afterAdding = qaHaifa56Page.getListsQuantity();
-        System.out.println("Lists after adding: " + afterAdding);
-
         Assert.assertEquals(afterAdding,beforeAdding+1,
                 "The quantity of lists before adding new list is not the same as the quantity after adding");
 
     }
 
     @Test
-    public void createNewCard() throws InterruptedException {
+    public void createNewCard()  {
+        if (!qaHaifa56Page.existsList()) qaHaifa56Page.createNewList("Test");
 
-        if(! qaHaifa56Page.existsList())
-            qaHaifa56Page.createNewList("Test");
+        int beforeAdding = qaHaifa56Page.receiveQuantityOfCards();
+        qaHaifa56Page.pressAddCardButton();
+        qaHaifa56Page.enterTextToCard("test card");
+        qaHaifa56Page.submitAddingCard();
+        qaHaifa56Page.cancelEditCardMode();
 
-        //---Receive the quantity of cards ---
-        int beforeAdding = qaHaifa56Page.receiveQuantityCards();
-
-        qaHaifa56Page.createNewCard("Test card");
-
-        int afterAdding = qaHaifa56Page.receiveQuantityCards();
-
+        int afterAdding = qaHaifa56Page.receiveQuantityOfCards();
         Assert.assertEquals(afterAdding,beforeAdding+1,
                 "The quantity of cards before adding new card is not the same as the quantity after adding");
 
+
     }
+
+
+
+
+
 }

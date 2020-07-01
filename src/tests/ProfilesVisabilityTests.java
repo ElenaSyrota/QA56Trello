@@ -8,54 +8,47 @@ import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 import pages.BoardsPageHelper;
 import pages.LoginPageHelper;
-import pages.ProfilesVisabilityHelper;
+import pages.ProfileVisabilityHelper;
+import pages.UpperMenuHelper;
 
 import java.util.List;
 
 public class ProfilesVisabilityTests extends TestBase {
-
     LoginPageHelper loginPage;
     BoardsPageHelper boardsPage;
-    ProfilesVisabilityHelper profilesVisability;
+    UpperMenuHelper upperMenuPage;
+    ProfileVisabilityHelper profileVisabilityPage;
 
     @BeforeMethod
     public void initTests() throws InterruptedException {
-        loginPage = PageFactory.initElements(driver,LoginPageHelper.class);
+        loginPage = PageFactory.initElements(driver, LoginPageHelper.class);
         boardsPage = PageFactory.initElements(driver, BoardsPageHelper.class);
-        profilesVisability = PageFactory.initElements(driver, ProfilesVisabilityHelper.class);
+        upperMenuPage = PageFactory.initElements(driver, UpperMenuHelper.class);
+        profileVisabilityPage = PageFactory.initElements(driver, ProfileVisabilityHelper.class);
 
         loginPage.openLoginPage();
         loginPage.loginAsAtlassian(LOGIN,PASSWORD);
         boardsPage.waitUntilPageIsLoaded();
+        upperMenuPage.openMenuPage();
+        upperMenuPage.waitUntilPageIsLoaded();
+        upperMenuPage.openProfileVisabilityScreen();
+        profileVisabilityPage.waitUntilPageIsLoaded();
 
-        profilesVisability.openUpRightMenu();
-        profilesVisability.waitUntilUpRightMenuIsVisible();
-        profilesVisability.openProfileVisabilityMenu();
-        profilesVisability.waitUntilPageIsLoaded();
 
     }
 
     @Test
-    public void lettersIconTest() throws InterruptedException {
-        profilesVisability.openMemberMenu();
+    public void lettersIconTest(){
 
-        profilesVisability.nameTextLabel();
-
-        Assert.assertEquals(profilesVisability.openMemberMenu(),profilesVisability.nameTextLabel(),"'Text Menu Button' and 'Text UserName Icon' have a different names");
-
+        Assert.assertTrue(profileVisabilityPage.verifyListIcons(USERNAME), "The text on the upper right icon and on the icon on profile is not the same");
     }
-
 
     @Test
     public void userNameDisplayingTest(){
 
-      Assert.assertEquals(profilesVisability.receiveUserNameAfterShtrudel(),
-              profilesVisability.receiveUserNameFieldUser(),
-              "The text on the upper right icon and on the icon on profile is not the same");
+        Assert.assertEquals(profileVisabilityPage.getUserNameAfterShtrudelText(), profileVisabilityPage.getUserNameText(),
+                "The text of userName and userNameAfterShtrudel is not the same ");
     }
 
-    private String createLocatorIconlist(String username) {
-        return "//div[@title='" + username + " (" + username + ")']//span";
-    }
 
 }
